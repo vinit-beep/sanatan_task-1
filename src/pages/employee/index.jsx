@@ -8,6 +8,7 @@ import * as yup from "yup";
 const Employee = () => {
   const [companyList, setCompanyList] = useState([]);
   const [empList, setEmpList] = useState([]);
+  const [companyId, setCompanyId] = useState();
   const [formSate, setFormState] = useState({
     name: "",
     email: "",
@@ -15,6 +16,7 @@ const Employee = () => {
     phone: "",
     salary: "",
   });
+  console.log(formSate._id);
   const [isUpdate, setIsUpdate] = useState(false);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ const Employee = () => {
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [isUpdate]);
   useEffect(() => {
     try {
       (async () => {
@@ -41,7 +43,6 @@ const Employee = () => {
     }
   }, [isUpdate]);
 
-
   const employeeValidationSchema = yup.object({
     name: yup.string().required("Name is required"),
     email: yup
@@ -49,18 +50,24 @@ const Employee = () => {
       .email("Invalid email format")
       .required("Email is required"),
     dob: yup.date().nullable().required("Date of birth is required"),
-    phone: yup.string().required("Phone is required"),
+    phone: yup
+      .string()
+      .matches(/^(?:[0-9] ?){6,14}[0-9]$/, "Invalid phone number")
+      .required("Phone is required"),
   });
 
   const editEmployee = async (values) => {
+    console.log(values, "val");
     const formData = {
       name: values.name,
       email: values.email,
       phone: values.phone,
       salary: values.salary,
       dob: values.dob,
+      company_id: values.company_id,
       _id: values._id,
     };
+    console.log(formData);
     const data = await fetch("/api/employee", {
       method: "put",
       body: JSON.stringify(formData),
@@ -70,27 +77,37 @@ const Employee = () => {
     setFormState({
       name: "",
       email: "",
-      dob: "",
       phone: "",
+      dob: "",
       salary: "",
     });
   };
+  const DeleteEmployee = async (values) => {
+    console.log(values, "val");
+    const formData = {
+      _id: values._id,
+    };
+    const data = await fetch("/api/employee", {
+      method: "delete",
+      body: JSON.stringify(formData),
+    });
+    const res = await data.json();
+    setIsUpdate((prev) => !prev);
+    alert("Employee Deleted Successfully");
+  };
   const { errors, values, handleBlur, handleChange, handleSubmit, touched } =
     useFormik({
-      initialValues: {
-        companyId: "",
-        name: "",
-        email: "",
-        dob: "",
-        phone: "",
-        salary: "",
-      },
+      initialValues: formSate,
       validationSchema: employeeValidationSchema,
       enableReinitialize: true,
       onSubmit: (values) => {
         console.log(values);
+
         if (formSate._id) {
           editEmployee(values);
+          alert("Employee Edited Successfully");
+        } else if (formSate._id) {
+          DeleteEmployee(values);
         } else {
           createEmployee(values);
         }
@@ -104,8 +121,6 @@ const Employee = () => {
       alert("Company Added successfully");
     }
   }
-
-  
 
   return (
     <div className="w-1/2 mx-auto mt-10">
@@ -247,7 +262,7 @@ const Employee = () => {
                       edit
                     </button>
                     <button
-                      onClick={() => DeleteCompany()}
+                      onClick={() => DeleteEmployee(c)}
                       class="ms-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                     >
                       Delete

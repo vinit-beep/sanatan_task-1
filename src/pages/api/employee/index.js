@@ -55,7 +55,9 @@ const getMaxSalary = (id) => {
 export default asyncErrorHandler(async function handler(req, res) {
   await connectDB();
   if (req.method === "GET") {
-    const emp_doc = await Employee.find();
+    const emp_doc = await Employee.find().populate({
+      path: "company_id",
+    });
 
     res.status(201).json({
       status: true,
@@ -99,6 +101,16 @@ export default asyncErrorHandler(async function handler(req, res) {
     const { _id } = JSON.parse(req.body);
     const updateData = JSON.parse(req.body);
     const updatedata = await Employee.findByIdAndUpdate(_id, updateData, {
+      new: true,
+    });
+    res.status(201).json({
+      status: true,
+      data: updatedata,
+    });
+  } else if (req.method === "DELETE") {
+    const { _id } = JSON.parse(req.body);
+
+    const updatedata = await Employee.findByIdAndDelete(_id, {
       new: true,
     });
     res.status(201).json({

@@ -6,6 +6,7 @@ import Button from "@/components/shared/formElement/Button";
 import { postApi } from "@/utils/axios";
 const Company = () => {
   const [companyList, setCompanyList] = useState([]);
+ 
   const [formSate, setFormState] = useState({
     company_name: "",
   });
@@ -14,6 +15,7 @@ const Company = () => {
   const companyValidationSchema = yup.object({
     company_name: yup.string().trim().required(),
   });
+
   const editCompany = async (values) => {
     const formData = {
       company_name: values.company_name,
@@ -29,6 +31,21 @@ const Company = () => {
       company_name: "",
     });
   };
+  const DeleteCompany = async (values) => {
+    console.log(values,"delete");
+    const formData = {
+      _id: values._id,
+      
+    };
+    const data = await fetch("/api/company", {
+      method: "delete",
+      body: JSON.stringify(formData),
+    });
+    const res = await data.json();
+    setIsUpdate((prev) => !prev);
+    alert("sucessfilly Deleted")
+    
+  };
 
   const { errors, values, handleBlur, handleChange, handleSubmit, touched } =
     useFormik({
@@ -38,7 +55,11 @@ const Company = () => {
       onSubmit: (values) => {
         if (formSate._id) {
           editCompany(values);
-        } else {
+        } else if(formSate._id){
+          DeleteCompany(values)
+
+        }
+        else {
           createCompany(values);
         }
       },
@@ -113,7 +134,7 @@ const Company = () => {
                       edit
                     </button>
                     <button
-                      onClick={() => DeleteCompany()}
+                      onClick={() => DeleteCompany(c)}
                       class="ms-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                     >
                       Delete
