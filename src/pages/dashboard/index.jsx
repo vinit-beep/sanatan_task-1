@@ -1,20 +1,18 @@
-import Table from "@/components/shared/table/Table";
-import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
-import * as yup from "yup";
+import Table from '@/components/shared/table/Table';
+import { useFormik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import * as yup from 'yup';
 
 const Dashboard = () => {
   const [companyList, setCompanyList] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState(
-    "65b005a2d5347d9ee74420f2"
-  );
+  const [selectedCompany, setSelectedCompany] = useState('65b005a2d5347d9ee74420f2');
   const [employeeData, setEmployeeData] = useState({
     highest: [],
-    secondHeight: [],
+    secondHeight: []
   });
 
   const getMaxSalary = async () => {
-    const data = await fetch("/api/employee/" + selectedCompany);
+    const data = await fetch('/api/employee/' + selectedCompany);
     const res = await data.json();
     setEmployeeData(res.data);
 
@@ -24,7 +22,7 @@ const Dashboard = () => {
   useEffect(() => {
     try {
       (async () => {
-        const data = await fetch("/api/company");
+        const data = await fetch('/api/company');
         const res = await data.json();
         setCompanyList(res.data);
       })();
@@ -39,33 +37,30 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="flex justify-center">
+      <div className="w-1/2 mx-auto mt-10">
         <div>
-          <div className=" mt-3 ms-3">
-          <label className="block mb-2 text-sm font-medium text-green-700 dark:text-green-500">
-            Select Company Name{" "}
-          </label>
+          <div className=" mt-3 ms-3 w-64 mb-10">
+            <label className="block mb-2 text-sm font-medium text-green-700 dark:text-green-500">
+              Select Company Name
+            </label>
 
             <select
-              name={"company_id"}
+              name={'company_id'}
               className="bg-green-50 border border-green-500 text-green-900 dark:text-green-400 placeholder-green-700 dark:placeholder-green-500 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-700 dark:border-green-500"
               value={selectedCompany}
-              onChange={(e) => setSelectedCompany(e.target.value)}
-            >
+              onChange={(e) => setSelectedCompany(e.target.value)}>
               <option value=" ">-- select company</option>
               {companyList.map((c) => {
                 return <option value={c._id}>{c.company_name}</option>;
               })}
             </select>
           </div>
-          <div>
-            {" "}
-            <h1 className="font-bold mt-5">Highest</h1>
+          <div className="mb-10">
+            <h1 className="font-bold mt-5 bg-green-600 px-3 py-1">Highest Salary</h1>
             <Table data={employeeData.highest}></Table>
           </div>
           <div className="font-bold mt-5">
-            {" "}
-            <h1>Second Highest</h1>
+            <h1 className="font-bold mt-5 bg-green-600 px-3 py-1">Second Highest Salary</h1>
             <Table data={employeeData.secondHeight}></Table>
           </div>
         </div>
